@@ -130,6 +130,8 @@ class Purl
 			//ignore these
 			case CURLOPT_HEADER:
 			case CURLOPT_RETURNTRANSFER:
+			case CURLOPT_HTTPGET:
+			case CURLOPT_TIMEOUT:
 			
 			//might be important
 			case CURLOPT_INFILESIZE:
@@ -267,8 +269,8 @@ class Purl
         if (isset($this->_options[CURLOPT_CAINFO])) $options['ssl']['cafile'] = $this->_options[CURLOPT_CAINFO];
         
         if($this->_options[CURLOPT_USERPWD]) {
-			$url_parts = explode('//', $this->_url);
-			$this->_url = $url_parts[0].'//'.$this->_options[CURLOPT_USERPWD].'@'.$url_parts[1];
+			$url_parts = explode('://', $this->_url);
+			$this->_url = $url_parts[0].'://'.$this->_options[CURLOPT_USERPWD].'@'.$url_parts[1];
 		}
 
         if ($this->_method === 'POST') {
@@ -276,7 +278,7 @@ class Purl
         } elseif (!empty($query)) {
             $this->_url .= '?' . $query;
         }
-        
+
         $context = stream_context_create($options);
         
         stream_context_set_params($context, array('notification' => function() {
